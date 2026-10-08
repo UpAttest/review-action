@@ -62,7 +62,7 @@ test("matching change: quote with real size, register only matched files, reques
   assert.equal(upattest.calls[2].input.size_bytes, Buffer.byteLength(sent));
   const req = upattest.calls[4].input;
   assert.equal(req.budget_cents, 15000);
-  assert.equal(req.metadata.artifact_hash, HASH);
+  assert.equal(req.metadata.diff_sha256, HASH);
   assert.equal(req.attestation_type.variables.purpose, "Rotate tokens");
   assert.deepEqual(github.statuses.map((s) => s.state), ["pending"]);
   assert.match(github.statuses[0].target_url, /workspace\?role=customer&request=req_1/);
@@ -94,7 +94,7 @@ test("secrets in the matched diff: nothing is sent", async () => {
 test("an existing own signed record for the same diff: success, no new request", async () => {
   const github = fakeGitHub();
   const upattest = fakeUpAttest({
-    requests: [{ id: "req_old", status: "attested", attestation_id: "att_9", created_at: "2026-10-01", metadata: { artifact_hash: HASH } }],
+    requests: [{ id: "req_old", status: "attested", attestation_id: "att_9", created_at: "2026-10-01", metadata: { diff_sha256: HASH } }],
     attestation: { status: 200, body: { attestation: { id: "att_9", verdict: "pass" }, status: "active", private: true } },
   });
   const { results } = await run({ ...base, inputs: inputs(), github, upattest });
@@ -114,7 +114,7 @@ test("a public record by hash also satisfies the check; fail-on-verdicts turns i
 
 test("an open request for the same diff is not duplicated", async () => {
   const github = fakeGitHub();
-  const upattest = fakeUpAttest({ requests: [{ id: "req_open", status: "in_review", created_at: "2026-10-02", metadata: { artifact_hash: HASH } }, { id: "req_cancel", status: "cancelled", created_at: "2026-10-03", metadata: { artifact_hash: HASH } }] });
+  const upattest = fakeUpAttest({ requests: [{ id: "req_open", status: "in_review", created_at: "2026-10-02", metadata: { artifact_hash: HASH } }, { id: "req_cancel", status: "cancelled", created_at: "2026-10-03", metadata: { diff_sha256: HASH } }] });
   const { results } = await run({ ...base, inputs: inputs(), github, upattest });
   assert.equal(results[0].state, "pending");
   assert.equal(results[0].request_id, "req_open");

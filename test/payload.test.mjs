@@ -77,7 +77,8 @@ test("request is a limit order at the quoted price, private by default, with tra
   assert.equal(r.budget_cents, 15000);
   assert.equal(r.accept_quote, undefined, "never a market order");
   assert.deepEqual(r.policy, { data_class: "confidential", publication_allowed: false });
-  assert.equal(r.metadata.artifact_hash, "b".repeat(64));
+  assert.equal(r.metadata.diff_sha256, "b".repeat(64));
+  assert.equal("artifact_hash" in r.metadata, false); // reserved by the API (metadata keys that once carried platform state)
   assert.equal(r.metadata.source, "github-action");
   assert.equal(r.attestation_type.type_id, "software.change_review");
   assert.match(r.scope.description, /auth\/a\.ts/);

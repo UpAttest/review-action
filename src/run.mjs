@@ -109,7 +109,7 @@ export const requestLink = (inputs, id) => `${inputs.siteUrl}/workspace?role=cus
 export async function findExisting(upattest, hash) {
   const mine = await upattest.listRequests();
   if (mine.status === 401 || mine.status === 403) throw new Error(`UpAttest refused the api-key (${mine.status}): ${upattest.message(mine)}. Create an agent key with requests:read, requests:write and artifacts:write.`);
-  const requests = mine.status === 200 ? (mine.body?.requests ?? []).filter((r) => r.metadata?.artifact_hash === hash) : [];
+  const requests = mine.status === 200 ? (mine.body?.requests ?? []).filter((r) => (r.metadata?.diff_sha256 ?? r.metadata?.artifact_hash) === hash) : [];
   requests.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
   for (const r of requests.filter((x) => x.status === "attested")) {
     const a = await upattest.requestAttestation(r.id);
