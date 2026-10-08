@@ -1,0 +1,77 @@
+name: UpAttest Human Review
+description: Request a verified human professional's review of risky pull request changes, and hold a status check until the signed attestation exists.
+author: UpAttest
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  api-key:
+    description: UpAttest agent API key with artifacts:write, requests:write and requests:read. Store it as the repository secret UPATTEST_API_KEY.
+    required: true
+  paths:
+    description: Newline- or comma-separated globs of paths that need human review, e.g. "infra/**", "auth/**", "*.sql". A pattern without "/" matches the file name at any depth. Prefix with "!" to exclude.
+    required: true
+  attestation-type:
+    description: Attestation type id from GET /v1/attestation-types (for example software.change_review). Empty to request a plain rubric review.
+    required: false
+    default: software.change_review
+  attestation-variables:
+    description: Optional JSON object of extra template inputs for the attestation type. For software.change_review, change_ref and purpose are filled from the pull request.
+    required: false
+    default: ""
+  rubric:
+    description: Review rubric, code.security or code.correctness.
+    required: false
+    default: code.security
+  credential-type:
+    description: Credential the reviewer must hold (for example staff_engineer). Empty for identity-verified reviewers.
+    required: false
+    default: staff_engineer
+  max-price:
+    description: Maximum total per review in US dollars, including UpAttest's requester fee. Nothing is requested above it.
+    required: true
+  required:
+    description: When true, post a commit status that stays pending until an UpAttest attestation exists for the reviewed diff. Make it a required check in branch protection to block merges until then.
+    required: false
+    default: "true"
+  fail-on-verdicts:
+    description: Comma-separated verdicts that turn the status into a failure (pass, qualified, fail, no_opinion). Empty means any completed review satisfies the check.
+    required: false
+    default: ""
+  mode:
+    description: "auto (request on pull_request events, check on schedule/workflow_dispatch), request, or check (never creates a request)."
+    required: false
+    default: auto
+  diff-scope:
+    description: matched sends only the files that match paths (default); all sends the whole pull request diff.
+    required: false
+    default: matched
+  api-url:
+    description: UpAttest API origin. Use https://api-sandbox.upattest.com for the sandbox.
+    required: false
+    default: https://api.upattest.com
+  site-url:
+    description: UpAttest website origin used in links.
+    required: false
+    default: https://upattest.com
+  github-token:
+    description: Token used to read the pull request diff and post the commit status.
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  matched:
+    description: "true when the pull request changes a configured path."
+  artifact-hash:
+    description: sha256 of the diff sent for review (LF line endings).
+  request-id:
+    description: UpAttest request id, when one was created or found.
+  attestation-id:
+    description: Attestation id, when a signed record exists for this diff.
+  state:
+    description: "not_required, requested, pending, attested, refused or failed."
+
+runs:
+  using: node24
+  main: src/main.mjs

@@ -1,0 +1,12 @@
+{
+  "name": "upattest-review-action",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GitHub Action: request an UpAttest human review for risky pull request changes and hold a status check until the signed attestation exists.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}
