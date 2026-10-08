@@ -105,7 +105,7 @@ export function requestInput(inputs, ctx) {
     idempotency_key: idempotencyKey({ repoId, pr, hash, attestationType: inputs.attestationType, rubric: inputs.rubric }),
     policy: { data_class: isPrivate ? "confidential" : "public", publication_allowed: false },
     ...(selection ? { attestation_type: selection } : {}),
-    metadata: { source: "github-action", owner, repo, repo_id: repoId, pr, head_sha: headSha, artifact_hash: hash, run_url: runUrl, matched_files: matchedFiles.length },
+    metadata: { source: "github-action", owner, repo, repo_id: repoId, pr, head_sha: headSha, diff_sha256: hash, run_url: runUrl, matched_files: matchedFiles.length },
   };
 }
 
